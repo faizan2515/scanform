@@ -1,0 +1,182 @@
+@import "tailwindcss";
+
+/* Single source of truth for the interface and exported QR palettes. */
+@theme static {
+  --font-sans: Arial, Helvetica, sans-serif;
+  --font-serif: Georgia, serif;
+  --breakpoint-tablet: 651px;
+  --breakpoint-desktop: 901px;
+  --breakpoint-wide: 1400px;
+
+  --color-ink: #192943;
+  --color-muted: #65738b;
+  --color-muted-soft: #8390a7;
+  --color-muted-strong: #425572;
+  --color-canvas: #f5f7fc;
+  --color-paper: #ffffff;
+  --color-surface: #f4f6fc;
+  --color-surface-muted: #eaf0fa;
+  --color-preview: #edf2fc;
+  --color-dialog: #fbfcff;
+  --color-line: #e1e7f2;
+  --color-line-strong: #d5deed;
+  --color-line-soft: #eaf0f8;
+
+  --color-accent: #315fea;
+  --color-accent-hover: #244ed0;
+  --color-accent-border: #2855db;
+  --color-accent-ink: #ffffff;
+  --color-accent-marker: #7898ef;
+  --color-accent-strong: #315fea;
+  --color-selection: #90a9ed;
+  --color-selection-surface: #edf2ff;
+  --color-selection-ink: #29498d;
+  --color-selection-strong: #315fea;
+  --color-status: #5276c9;
+  --color-status-surface: #e5edff;
+  --color-status-ink: #4a65a0;
+  --color-focus: #315fea;
+  --color-focus-field: #6c8deb;
+  --color-decoration: #9aafd7;
+  --color-grid: #a8bbdf55;
+  --color-danger: #b64c4c;
+  --color-warning: #996324;
+  --color-warning-surface: #fff6e7;
+
+  --color-toast: #1c3052;
+  --color-toast-ink: #f2f6ff;
+  --color-toast-muted: #c3d1ee;
+  --color-toast-border: #3d5783;
+  --color-overlay: #162d5066;
+  --color-shadow: #1e365d;
+  --color-shadow-dialog: #142c50;
+  --color-button-edge: #1d43b2;
+
+  --color-qr-original-ink: #192943;
+  --color-qr-original-paper: #ffffff;
+  --color-qr-forest-ink: #254b3d;
+  --color-qr-forest-paper: #f1f5ed;
+  --color-qr-indigo-ink: #3a3882;
+  --color-qr-indigo-paper: #f1f0ff;
+  --color-qr-terracotta-ink: #823c2c;
+  --color-qr-terracotta-paper: #fff3e9;
+  --color-qr-midnight-ink: #1b3958;
+  --color-qr-midnight-paper: #edf5fc;
+
+  --shadow-studio: 0 6px 25px
+    color-mix(in srgb, var(--color-shadow) 2%, transparent);
+  --shadow-qr:
+    0 12px 22px color-mix(in srgb, var(--color-shadow) 13%, transparent),
+    0 2px 5px color-mix(in srgb, var(--color-shadow) 3%, transparent);
+  --shadow-qr-hover:
+    0 14px 26px color-mix(in srgb, var(--color-shadow) 13%, transparent),
+    0 2px 5px color-mix(in srgb, var(--color-shadow) 3%, transparent);
+  --shadow-button: 0 2px 0 var(--color-button-edge);
+  --shadow-selected: inset 0 0 0 0.3px var(--color-selection);
+  --shadow-segment: 0 1px 2px
+    color-mix(in srgb, var(--color-shadow) 2%, transparent);
+  --shadow-toast: 0 5px 25px
+    color-mix(in srgb, var(--color-shadow) 13%, transparent);
+  --shadow-dialog: 0 25px 100px
+    color-mix(in srgb, var(--color-shadow-dialog) 27%, transparent);
+  --background-image-preview-grid: radial-gradient(
+    var(--color-grid) 0.7px,
+    transparent 0.7px
+  );
+  --animate-toast-in: toast-in 0.2s ease;
+  --animate-dialog-in: dialog-in 0.22s cubic-bezier(0.16, 1, 0.3, 1) both;
+  --animate-dialog-out: dialog-out 0.18s ease-in both;
+  --animate-backdrop-in: backdrop-in 0.22s ease-out both;
+  --animate-backdrop-out: backdrop-out 0.18s ease-in both;
+
+  @keyframes dialog-in {
+    from {
+      opacity: 0;
+      transform: translateY(12px) scale(0.98);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  @keyframes dialog-out {
+    from {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+    to {
+      opacity: 0;
+      transform: translateY(8px) scale(0.98);
+    }
+  }
+
+  @keyframes backdrop-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes backdrop-out {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
+    }
+  }
+
+  @keyframes toast-in {
+    /* Keep Tailwind's horizontal translate intact while animating vertically. */
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+/* Only document defaults live here; components use Tailwind utilities. */
+@layer base {
+  body {
+    @apply m-0 bg-canvas font-sans text-sm text-ink antialiased;
+    font-synthesis: none;
+  }
+  button {
+    @apply cursor-pointer transition-[background,transform,color] duration-200 disabled:cursor-not-allowed disabled:opacity-45 enabled:active:translate-y-px;
+  }
+  button,
+  a,
+  input,
+  select,
+  textarea,
+  summary {
+    @apply outline-offset-[5px];
+    -webkit-tap-highlight-color: transparent;
+  }
+  button,
+  a,
+  summary {
+    @apply focus-visible:outline-2 focus-visible:outline-focus;
+  }
+  input,
+  select,
+  textarea {
+    @apply focus:outline-2 focus:outline-offset-1 focus:outline-focus-field;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after,
+  *::backdrop {
+    @apply animate-none! transition-none! scroll-auto!;
+  }
+}
