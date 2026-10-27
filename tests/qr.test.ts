@@ -4,8 +4,9 @@ import assert from "node:assert/strict";
 import { Resvg } from "@resvg/resvg-js";
 import jsQR from "jsqr";
 import { buildContent } from "@/lib/content.ts";
-import { contrastRatio } from "@/lib/color.ts";
+import { contrastRatio, normalizeHexColor } from "@/lib/color.ts";
 import { makeQR } from "@/lib/qr.ts";
+import { themeColor } from "@/lib/theme.ts";
 import type { Content, Correction } from "@/types/qr.ts";
 
 const blank: Content = {
@@ -125,4 +126,47 @@ test("Wi-Fi escaping and email encoding preserve special characters", () => {
 test("contrast flags indistinguishable and inverted colors", () => {
   assert.equal(contrastRatio("#ffffff", "#ffffff").ratio, 1);
   assert.equal(contrastRatio("#ffffff", "#202720").inverted, true);
+});
+
+test("CSS shorthand colors normalize to six-digit encoder and input values", () => {
+  assert.equal(normalizeHexColor("#fff"), "#ffffff");
+  assert.equal(normalizeHexColor("#000"), "#000000");
+  assert.equal(normalizeHexColor(" #AbC "), "#aabbcc");
+  assert.equal(normalizeHexColor("#192943"), "#192943");
+  for (const value of ["", "#ff", "#ggg", "#ffff", "transparent"]) {
+    assert.equal(normalizeHexColor(value), null);
+  }
+});
+
+test("theme resolver accepts the production-minified white token", (t) => {
+  const keys = ["document", "getComputedStyle"] as const;
+  const originals = keys.map((key) =>
+    Object.getOwnPropertyDescriptor(globalThis, key),
+  );
+  t.after(() => {
+    keys.forEach((key, index) => {
+      const descriptor = originals[index];
+      if (descriptor) Object.defineProperty(globalThis, key, descriptor);
+      else Reflect.deleteProperty(globalThis, key);
+    });
+  });
+  Object.defineProperty(globalThis, "document", {
+    configurable: true,
+    value: { documentElement: {} },
+  });
+  Object.defineProperty(globalThis, "getComputedStyle", {
+    configurable: true,
+    value: () => ({
+      getPropertyValue: (key: string) =>
+        key === "--color-qr-original-paper" ? "#fff" : "",
+    }),
+  });
+
+  const paper = themeColor("qr-original-paper");
+  assert.equal(paper, "#ffffff");
+  assert.equal(
+    decode(makeQR(payloads[0], "#192943", paper, false, "M").svg),
+    payloads[0],
+  );
+  assert.throws(() => themeColor("missing"), /opaque hex color/);
 });
